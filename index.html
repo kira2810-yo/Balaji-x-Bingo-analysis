@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balaji vs Bingo — Consumer Survey Analysis</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Chart.js for rendering the interactive charts natively -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Nunito', sans-serif; background-color: #FFF7ED; margin: 0; padding-bottom: 40px; color: #334155; }
+        .header { background: linear-gradient(135deg, #EA580C, #F97316); padding: 24px 32px 20px; color: white; }
+        .header-main { display: flex; align-items: center; gap: 16; margin-bottom: 16px; }
+        .header h1 { margin: 0; fontSize: 24px; fontWeight: 900; letter-spacing: -0.5px; }
+        .header p { margin: 4px 0 0; font-size: 13px; opacity: 0.85; }
+        .tab-bar { display: flex; gap: 4px; }
+        .tab-btn { padding: 8px 16px; borderRadius: 8px; border: none; cursor: pointer; background: transparent; color: white; font-weight: 600; font-size: 13px; font-family: 'Nunito', sans-serif; border-radius: 8px; transition: background 0.2s; }
+        .tab-btn.active { background: rgba(255,255,255,0.25); font-weight: 800; backdrop-filter: blur(4px); }
+        .content-container { padding: 24px 32px; }
+        .tab-content { display: none; }
+        .tab-content.active { display: flex; flex-direction: column; gap: 24px; }
+        .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        .stat-card { background: white; border-radius: 16px; padding: 20px 24px; border-left: 4px solid #F97316; box-shadow: 0 1px 8px rgba(0,0,0,0.07); display: flex; flex-direction: column; gap: 4px; }
+        .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .chart-card { background: white; border-radius: 16px; padding: 22px 24px; box-shadow: 0 1px 8px rgba(0,0,0,0.07); position: relative; }
+        .chart-card h3 { margin: 0; font-size: 14px; font-weight: 700; color: #334155; }
+        .chart-card p { margin: 2px 0 16px; font-size: 12px; color: #94A3B8; }
+        .chart-container { position: relative; height: 220px; width: 100%; }
+        .banner { background: linear-gradient(135deg, #FFF7ED, #FFEDD5); border: 1px solid #FED7AA; border-radius: 14px; padding: 16px 20px; display: flex; align-items: center; gap: 16px; }
+        .tag-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+        .tag { background: rgba(249, 115, 22, 0.1); color: #F97316; border: 1px solid rgba(249, 115, 22, 0.25); border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 700; }
+        .tag.bingo { background: rgba(13, 148, 136, 0.1); color: #0D9488; border: 1px solid rgba(13, 148, 136, 0.25); }
+        .tag.green { background: rgba(16, 185, 129, 0.1); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.25); }
+        .progress-bar-container { background: #F1F5F9; border-radius: 99px; height: 12px; overflow: hidden; margin-top: 6px; }
+        .progress-bar { height: 100%; border-radius: 99px; }
+        .ppt-layout { display: flex; flex-direction: column; gap: 20px; }
+        .thumb-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; }
+        .thumb-btn { min-width: 120px; padding: 8px 10px; border-radius: 10px; cursor: pointer; border: 2px solid #E2E8F0; background: white; text-align: left; }
+        .thumb-btn.active { background: #FFF7ED; border-color: #F97316; }
+        .slide-viewer { background: rgba(249, 115, 22, 0.05); border: 1px solid rgba(249, 115, 22, 0.2); border-radius: 16px; padding: 28px 32px; min-height: 240px; display: flex; gap: 16px; }
+        .slide-icon { width: 52px; height: 52px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; flex-shrink: 0; }
+        .slide-text h4 { margin: 4px 0 16px; font-size: 22px; font-weight: 800; color: #334155; }
+        .slide-text ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 10px; color: #475569; font-size: 14px; line-height: 1.5; }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="header-main">
+            <div style="font-size: 36px; margin-right: 12px;">🍟</div>
+            <div>
+                <h1>Balaji vs Bingo — Consumer Survey Analysis</h1>
+                <p>ITC Bingo Gramage Strategy Study · 262 Respondents · Karnataka · May 2026</p>
+            </div>
+        </div>
+        <div class="tab-bar">
+            <button class="tab-btn active" onclick="switchTab(event, 'overview')">📊 Survey Overview</button>
+            <button class="tab-btn" onclick="switchTab(event, 'brand')">🏷️ Brand Analysis</button>
+            <button class="tab-btn" onclick="switchTab(event, 'switch')">🔄 Switch Analysis</button>
+            <button class="tab-btn" onclick="switchTab(event, 'ppt')">📑 PPT Slides Guide</button>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content-container">
+        
+        <!-- OVERVIEW TAB -->
+        <div id="overview" class="tab-content active">
+            <div class="kpi-row">
+                <div class="stat-card" style="border-left-color: #F97316;">
+                    <div style="font-size: 28px; font-weight: 800; color: #F97316;">262</div>
+                    <div style="font-size: 13px; font-weight: 700;">Total Respondents</div>
+                    <div style="font-size: 11px; color: #94A3B8;">Across 9 Karnataka cities</div>
+                </div>
+                <div class="stat-card" style="border-left-color: #0D9488;">
+                    <div style="font-size: 28px; font-weight: 800; color: #0D9488;">64%</div>
+                    <div style="font-size: 13px; font-weight: 700;">Would Switch to Bingo</div>
+                    <div style="font-size: 11px; color: #94A3B8;">If same gramage offered</div>
+                </div>
+                <div class="stat-card" style="border-left-color: #8B5CF6;">
+                    <div style="font-size: 28px; font-weight: 800; color: #8B5CF6;">83%</div>
+                    <div style="font-size: 13px; font-weight: 700;">Rate Balaji VFM as Good/Ext</div>
+                    <div style="font-size: 11px; color: #94A3B8;">Strong brand perception</div>
+                </div>
+                <div class="stat-card" style="border-left-color: #EA580C;">
+                    <div style="font-size: 28px; font-weight: 800; color: #EA580C;">Quantity</div>
+                    <div style="font-size: 13px; font-weight: 700;">Top Switch Driver</div>
+                    <div style="font-size: 11px; color: #94A3B8;">#1 reason to change brands</div>
+                </div>
+            </div>
+
+            <div class="chart-grid">
+                <div class="chart-card">
+                    <h3>Respondent Age Distribution</h3>
+                    <p>262 total responses</p>
+                    <div class="chart-container"><canvas id="ageChart"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <h3>Snack Consumption Frequency</h3>
+                    <p>How often do respondents buy chips?</p>
+                    <div class="chart-container"><canvas id="freqChart"></canvas></div>
+                </div>
+            </div>
+
+            <div class="chart-grid">
+                <div class="chart-card">
+                    <h3>Survey Reach by City</h3>
+                    <p>9 Karnataka cities covered</p>
+                    <div class="chart-container"><canvas id="cityChart"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <h3>Most-Purchased Balaji Variant</h3>
+                    <p>Which SKU do consumers buy most?</p>
+                    <div class="chart-container"><canvas id="variantChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BRAND ANALYSIS TAB -->
+        <div id="brand" class="tab-content">
+            <div class="banner">
+                <div style="font-size: 28px;">🔍</div>
+                <div>
+                    <div style="font-weight: 800; font-size: 14px;">Key Strategic Insight</div>
+                    <div style="font-size: 13px; color: #64748B; margin-top: 4px;">
+                        Consumers buy <strong>Balaji for Value for Money</strong> (154 mentions) but choose <strong>Bingo for Taste</strong> (180 mentions). This means Bingo's gramage parity strategy directly attacks Balaji's #1 advantage.
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-card" style="width: calc(100% - 48px);">
+                <h3>Why Consumers Choose Each Brand — Factor Comparison</h3>
+                <p>Multi-select responses (total mentions, n=262)</p>
+                <div class="chart-container" style="height: 280px;"><canvas id="factorChart"></canvas></div>
+                <div class="tag-row">
+                    <span class="tag">Balaji WINS on Value for Money (+84 mentions)</span>
+                    <span class="tag bingo">Bingo WINS on Taste (+42 mentions)</span>
+                    <span class="tag bingo">Bingo WINS on Brand Loyalty (+39 mentions)</span>
+                </div>
+            </div>
+
+            <div class="chart-grid">
+                <div class="chart-card">
+                    <h3>Balaji Value-for-Money Rating</h3>
+                    <p>How satisfied are buyers with Balaji's quantity?</p>
+                    <div class="chart-container"><canvas id="vfmChart"></canvas></div>
+                    <div style="text-align: center; margin-top: 12px;"><span class="tag green">83% rate Balaji VFM as Good or Excellent</span></div>
+                </div>
+                <div class="chart-card">
+                    <h3>Brand Loyalty Comparison</h3>
+                    <p>Habit/loyalty as a purchase driver</p>
+                    <div style="margin-top: 20px;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                                <span style="font-weight: 700;">Bingo</span>
+                                <span style="font-weight: 800; color: #0D9488;">67 mentions (26%)</span>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" style="width: 100%; background: #0D9488;"></div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 16px;">
+                            <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                                <span style="font-weight: 700;">Balaji</span>
+                                <span style="font-weight: 800; color: #F97316;">28 mentions (11%)</span>
+                            </div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" style="width: 41.7%; background: #F97316;"></div>
+                            </div>
+                        </div>
+                        <div style="background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 10px; padding: 10px 14px; margin-top: 24px;">
+                            <div style="font-size: 12px; color: #047857; font-weight: 700;">💡 Implication</div>
+                            <div style="font-size: 12px; color: #065F46; margin-top: 4px;">Bingo has 2.4x more loyal customers than Balaji — yet Balaji dominates on quantity perception. Gramage parity removes Balaji's last moat.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SWITCH ANALYSIS TAB -->
+        <div id="switch" class="tab-content">
+            <div style="background: linear-gradient(135deg, #0D9488, #0F766E); border-radius: 16px; padding: 24px 28px; color: white; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; text-align: center;">
+                <div>
+                    <div style="font-size: 36px; font-weight: 800;">64%</div>
+                    <div style="font-size: 13px; font-weight: 700; margin-top: 4px;">Would switch if same gramage</div>
+                    <div style="font-size: 11px; opacity: 0.75; margin-top: 2px;">Definitely + Likely</div>
+                </div>
+                <div>
+                    <div style="font-size: 36px; font-weight: 800;">79%</div>
+                    <div style="font-size: 13px; font-weight: 700; margin-top: 4px;">Likely to try Crunchex ₹10 + 50% extra</div>
+                    <div style="font-size: 11px; opacity: 0.75; margin-top: 2px;">Highly + Moderately likely</div>
+                </div>
+                <div>
+                    <div style="font-size: 36px; font-weight: 800;">73%</div>
+                    <div style="font-size: 13px; font-weight: 700; margin-top: 4px;">Likely to try Crunchem ₹5 + 50% extra</div>
+                    <div style="font-size: 11px; opacity: 0.75; margin-top: 2px;">Highly + Moderately likely</div>
+                </div>
+            </div>
+
+            <div class="chart-card" style="width: calc(100% - 48px);">
+                <h3>If Bingo Offers EXACT Same Quantity as Balaji — Switch Likelihood</h3>
+                <p>Hypothetical proposition: same price, same gramage</p>
+                <div class="chart-container"><canvas id="switchLikelihoodChart"></canvas></div>
+            </div>
+
+            <div class="chart-grid">
+                <div class="chart-card">
+                    <h3>Bingo Crunchem ₹5 C&O — 50% Extra Pack</h3>
+                    <p>Same gramage as Balaji Crunchem ₹5</p>
+                    <div class="chart-container"><canvas id="crunchem5Chart"></canvas></div>
+                    <div style="text-align: center; margin-top: 8px;"><span class="tag">73% would try this pack</span></div>
+                </div>
+                <div class="chart-card">
+                    <h3>Bingo Crunchex ₹10 FC CHL — 50% Extra Pack</h3>
+                    <p>Same gramage as Balaji Crunchex ₹10</p>
+                    <div class="chart-container"><canvas id="crunchex10Chart"></canvas></div>
+                    <div style="text-align: center; margin-top: 8px;"><span class="tag bingo">79% would try this pack</span></div>
+                </div>
+            </div>
+
+            <div class="chart-card" style="width: calc(100% - 48px);">
+                <h3>Primary Factor That Would Make Consumers Switch Brands</h3>
+                <p>What would it take to leave your current brand?</p>
+                <div class="chart-container"><canvas id="switchDriversChart"></canvas></div>
+                <div class="tag-row">
+                    <span class="tag bingo">More Quantity = #1 switch driver (36%)</span>
+                    <span class="tag">Better Taste = #2 switch driver (31%)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- PPT SLIDES TAB -->
+        <div id="ppt" class="tab-content">
+            <div class="ppt-layout">
+                <div style="font-size: 13px; color: #64748B;">7 suggested PPT slides based on your survey data. Click any slide to preview its content.</div>
+                <div class="thumb-scroll" id="slideThumbs"></div>
+                <div class="slide-viewer" id="slideViewer"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripting for Interactions and Engine Execution -->
+    <script>
+        // Data arrays explicitly converted for ChartJS parsing
+        const total = 262;
+        const clrs = { orange: '#F97316', deepOrange: '#EA580C', yellow: '#FBBF24', lightOrange: '#FED7AA', teal: '#0D9488', gray: '#94A3B8', lightGray: '#CBD5E1', green: '#10B981', lightGreen: '#34D399', red: '#EF4444' };
+
+        // Tab Management Logic
+        function switchTab(evt, tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            evt.currentTarget.classList.add('active');
+        }
+
+        // Slide Repository
+        const slides = [
+            { num: "01", title: "Survey Overview & Methodology", icon: "📋", color: clrs.orange, points: ["262 respondents across 9 Karnataka cities (Udupi, Mangaluru, Hubli dominant)", "70% aged 18–34 — core snack-buying demographic", "42% consume chips 2–3× per week; 10% daily", "Objective: Understand Balaji loyalty drivers & assess Bingo gramage-parity strategy"] },
+            { num: "02", title: "Why Consumers Choose Balaji", icon: "🏆", color: clrs.deepOrange, points: ["#1 reason: Value for Money / Quantity (154 mentions, 59% of respondents)", "#2 reason: Taste & Flavor Choices (138 mentions, 53%)", "#3 reason: Easy Availability (112 mentions, 43%)", "Top SKUs: Crunchem ₹10 (28%), Punjabi Tadka (26%), Chatakha Patakha (26%)"] },
+            { num: "03", title: "Balaji vs. Bingo — Brand Perception Gap", icon: "⚖️", color: clrs.teal, points: ["Bingo beats Balaji on Taste by +42 mentions (180 vs 138)", "Balaji dominates on Value for Money by +84 mentions (154 vs 70)", "Bingo has 2.4× more loyal customers (67 vs 28 brand loyalty mentions)", "KEY: Balaji's moat is entirely gramage-based — not taste or loyalty"] },
+            { num: "04", title: "Consumer VFM Perception of Balaji", icon: "💰", color: "#8B5CF6", points: ["83% rate Balaji as Good or Excellent on Value for Money", "Only 17% say Average; <1% say Poor", "This strong VFM perception is the single biggest barrier to switching", "Remove the gramage gap and the barrier largely disappears"] },
+            { num: "05", title: "Gramage Parity Impact — Switch Likelihood", icon: "🔄", color: clrs.teal, points: ["If Bingo matches Balaji's gramage: 64% would definitely or likely switch to Bingo", "Only 7% would definitely NOT switch — a tiny loyal Balaji core", "29% neutral — available to capture with in-store promotions", "Hypothesis validated: Gramage is the primary purchase barrier for Bingo"] },
+            { num: "06", title: "New Pack Performance — Consumer Reaction", icon: "📦", color: '#059669', points: ["Crunchex ₹10 + 50% extra: 79% highly/moderately likely to switch (129+78 respondents)", "Crunchem ₹5 + 50% extra: 73% highly/moderately likely to switch (76+115 respondents)", "₹10 pack generates stronger response — higher intent among the larger pack buyers", "Both packs show strong viability with <7% unlikely to switch"] },
+            { num: "07", title: "Strategic Recommendations for ITC Bingo", icon: "🚀", color: clrs.deepOrange, points: ["LAUNCH both 50% extra packs (₹5 Crunchem C&O & ₹10 Crunchex CHL) — data strongly supports", "Lead messaging with QUANTITY — 'Now as much as Balaji!' — not taste", "Priority markets: Udupi, Mangaluru, Hubli — 79% of respondents are from here", "Target 18–24 segment (65% of respondents) via social + store-level activations", "Long-term: Once quantity parity is established, shift to taste-led messaging (Bingo's true advantage)"] }
+        ];
+
+        function renderSlide(index) {
+            const slide = slides[index];
+            document.querySelectorAll('.thumb-btn').forEach((btn, i) => btn.classList.toggle('active', i === index));
+            const viewer = document.getElementById('slideViewer');
+            viewer.style.background = `${slide.color}08`;
+            viewer.style.borderColor = `${slide.color}30`;
+            viewer.innerHTML = `
+                <div class="slide-icon" style="background:${slide.color}">${slide.icon}</div>
+                <div class="slide-text">
+                    <div style="font-size:11px; font-weight:800; color:${slide.color}; letter-spacing:1px;">SLIDE ${slide.num}</div>
+                    <h4>${slide.title}</h4>
+                    <ul>${slide.points.map(pt => `<li>${pt}</li>`).join('')}</ul>
+                </div>
+            `;
+        }
+
+        // Initialize PPT engine components
+        const thumbsContainer = document.getElementById('slideThumbs');
+        slides.forEach((s, idx) => {
+            const btn = document.createElement('button');
+            btn.className = `thumb-btn ${idx === 0 ? 'active' : ''}`;
+            btn.onclick = () => renderSlide(idx);
+            btn.innerHTML = `<div style="font-size:10px; font-weight:800; color:${s.color}">SLIDE ${s.num}</div>
+                             <div style="font-size:11px; font-weight:600; margin-top:2px; line-height:1.3;">${s.title}</div>`;
+            thumbsContainer.appendChild(btn);
+        });
+        renderSlide(0);
+
+        // Render Charts via ChartJS Architecture
+        window.onload = function() {
+            const optionsConfig = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } };
+
+            new Chart(document.getElementById('ageChart'), { type: 'pie', data: { labels: ["Under 18", "18–24", "25–34", "35+"], datasets: [{ data: [31, 170, 50, 11], backgroundColor: [clrs.orange, clrs.deepOrange, clrs.yellow, clrs.lightOrange] }] } });
+            
+            new Chart(document.getElementById('freqChart'), { type: 'bar', data: { labels: ["2–3x/week", "Once a week", "Occasionally", "Daily"], datasets: [{ data: [111, 77, 49, 25], backgroundColor: [clrs.orange, clrs.deepOrange, clrs.yellow, clrs.lightOrange] }] }, options: { indexAxis: 'y', plugins: { legend: { display: false } } } });
+
+            new Chart(document.getElementById('cityChart'), { type: 'bar', data: { labels: ["Udupi", "Mangaluru", "Hubli", "Bijapur", "Bellary", "Davangere", "Others"], datasets: [{ data: [87, 61, 59, 18, 16, 16, 5], backgroundColor: [clrs.orange, clrs.orange, clrs.orange, clrs.lightOrange, clrs.lightOrange, clrs.lightOrange, clrs.lightOrange] }] }, options: optionsConfig });
+
+            new Chart(document.getElementById('variantChart'), { type: 'bar', data: { labels: ["Crunchem ₹10", "Punjabi Tadka", "Chatakha Patakha", "Crunchex ₹5", "Others"], datasets: [{ data: [72, 69, 67, 37, 17], backgroundColor: [clrs.deepOrange, clrs.orange, clrs.orange, clrs.lightOrange, clrs.lightOrange] }] }, options: { indexAxis: 'y', plugins: { legend: { display: false } } } });
+
+            new Chart(document.getElementById('factorChart'), { type: 'bar', data: { labels: ["Taste & Flavors", "Value for Money", "Availability", "Quality & Crispiness", "Brand Loyalty"], datasets: [{ label: 'Balaji', data: [138, 154, 112, 86, 28], backgroundColor: clrs.orange }, { label: 'Bingo', data: [180, 70, 124, 94, 67], backgroundColor: clrs.teal }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: true, position: 'top' } } } });
+
+            new Chart(document.getElementById('vfmChart'), { type: 'doughnut', data: { labels: ["Excellent", "Good", "Average", "Poor"], datasets: [{ data: [89, 127, 44, 2], backgroundColor: [clrs.green, clrs.lightGreen, clrs.yellow, clrs.red] }] }, options: { plugins: { legend: { display: true, position: 'bottom' } } } });
+
+            new Chart(document.getElementById('switchLikelihoodChart'), { type: 'bar', data: { labels: ["Definitely Switch", "Likely Switch", "Neutral", "Unlikely", "Definitely Not"], datasets: [{ data: [86, 82, 75, 12, 7], backgroundColor: [clrs.green, clrs.lightGreen, clrs.gray, clrs.orange, clrs.red] }] }, options: optionsConfig });
+
+            new Chart(document.getElementById('crunchem5Chart'), { type: 'pie', data: { labels: ["Highly Likely", "Moderately Likely", "Neutral", "Unlikely"], datasets: [{ data: [76, 115, 54, 17], backgroundColor: [clrs.orange, clrs.yellow, clrs.gray, clrs.lightGray] }] }, options: { plugins: { legend: { display: true, position: 'bottom' } } } });
+
+            new Chart(document.getElementById('crunchex10Chart'), { type: 'pie', data: { labels: ["Highly Likely", "Moderately Likely", "Neutral", "Unlikely"], datasets: [{ data: [129, 78, 42, 13], backgroundColor: [clrs.teal, clrs.lightGreen, clrs.gray, clrs.lightGray] }] }, options: { plugins: { legend: { display: true, position: 'bottom' } } } });
+
+            new Chart(document.getElementById('switchDriversChart'), { type: 'bar', data: { labels: ["More Quantity, Same Price", "Better Taste / New Flavors", "Better Quality (Less Air)", "Better Availability"], datasets: [{ data: [94, 82, 50, 36], backgroundColor: [clrs.teal, clrs.orange, clrs.gray, clrs.gray] }] }, options: { indexAxis: 'y', plugins: { legend: { display: false } } } });
+        };
+    </script>
+</body>
+</html>
